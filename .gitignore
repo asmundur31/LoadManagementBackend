@@ -64,3 +64,5 @@ gunicorn.sock
 
 data/*
 !data/
+static/*
+!static/
