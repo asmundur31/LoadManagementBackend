@@ -1,0 +1,66 @@
+# Byte-compiled files
+*.py[cod]
+__pycache__/
+*.pyo
+
+# Virtual environment
+myvenv/
+api/.env
+.env
+
+# Dependencies
+*.egg-info/
+.eggs/
+pip-log.txt
+
+# Logs and temporary files
+*.log
+*.out
+*.pid
+*.swp
+*.swo
+*.~ 
+*.bak
+
+# Database files
+*.sqlite3
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Pytest cache and testing artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+*.cover
+.cache/
+
+# IDE-specific files
+.vscode/
+.idea/
+*.iml
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Build artifacts
+build/
+dist/
+*.wheel
+*.tar.gz
+*.zip
+
+# Migrations (if using Alembic or similar)
+migrations/
+
+# Gunicorn PID files (if applicable)
+gunicorn.pid
+gunicorn.sock
+
+data/*
+!data/
