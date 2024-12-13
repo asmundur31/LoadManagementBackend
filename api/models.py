@@ -1,9 +1,10 @@
 '''
     This module is to define the database tables.
 '''
-from database import Base
 from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, text, ForeignKey
 from sqlalchemy.orm import relationship
+
+from api.database import Base
 
 
 class Post(Base):

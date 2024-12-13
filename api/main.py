@@ -2,15 +2,24 @@
     This module is the startpoint for running tha API.
 '''
 from fastapi import FastAPI
-from database import engine
-from router import posts, upload, users
-import models
+from celery import Celery
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
+from api.config import settings
+import api.models as models
+from api.database import engine
+from api.router import posts, upload, users, tasks
+
 
 app = FastAPI()
+
+celery = Celery(
+    __name__,
+    broker=settings.CELERY_BROKER_URL,
+    backend=settings.CELERY_RESULT_BACKEND
+)
 
 # To create all the tables in the database 
 models.Base.metadata.create_all(bind=engine)
@@ -19,6 +28,7 @@ models.Base.metadata.create_all(bind=engine)
 app.include_router(posts.router)
 app.include_router(users.router)
 app.include_router(upload.router)
+app.include_router(tasks.router)
 
 # Here is code that allows bigger file uploads (100MB)
 class RequestSizeLimitMiddleware(BaseHTTPMiddleware):

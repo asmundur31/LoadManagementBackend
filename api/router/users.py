@@ -1,13 +1,13 @@
 '''
     This module is for all endpoints under the /users endpoint.
 '''
-import schemas
-import models
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-from database import get_db
 from sqlalchemy.orm import Session
-from fastapi import Depends
+
+import api.schemas as schemas
+import api.models as models
+from api.database import get_db
 
 router = APIRouter(
     prefix="/users",
