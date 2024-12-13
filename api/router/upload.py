@@ -8,9 +8,10 @@ import zipfile
 import pathlib
 from fastapi import APIRouter, UploadFile, HTTPException, Depends, Form
 from sqlalchemy.orm import Session
-from database import get_db
-from models import Upload, User
-from schemas import UploadResponse
+
+from api.database import get_db
+from api.models import Upload, User
+from api.schemas import UploadResponse
 
 router = APIRouter(
     prefix="/upload",

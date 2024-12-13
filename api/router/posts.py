@@ -1,11 +1,11 @@
 from typing import List
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from starlette import status
-import models
-import schemas
-from fastapi import APIRouter
-from database import get_db
+
+import api.models as models
+import api.schemas as schemas
+from api.database import get_db
 
 
 router = APIRouter(
