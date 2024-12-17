@@ -1,17 +1,14 @@
 '''
     This module is for all endpoints under the /upload endpoint.
 '''
-import os
-import io
-import shutil
-import zipfile
 import pathlib
 from fastapi import APIRouter, UploadFile, HTTPException, Depends, Form
 from sqlalchemy.orm import Session
 
 from api.database import get_db
-from api.models import Upload, User
+from api.models import Recording, User
 from api.schemas import UploadResponse
+import api.celery_tasks as ct
 
 router = APIRouter(
     prefix="/upload",
@@ -28,67 +25,42 @@ async def upload_directory(
     db: Session = Depends(get_db)
 ):
     """
-    Endpoint to upload a zipped directory.
-    - The zipped file will be extracted into `data/raw/`.
-    - Metadata for each extracted file will be stored in the database.
+    Endpoint to upload a zipped directory and trigger Celery tasks.
+    - Task 1: Extract files from the zip.
+    - Task 2: Process the extracted files.
     """
-   
-    # Check if uploaded file is a zip
+    # Validate file type
     if not file.filename.endswith('.zip'):
         raise HTTPException(status_code=400, detail="Only .zip files are allowed")
 
-    # Get the user
-    user = db.query(User).filter(User.id == user_id).one()
+    # Ensure user exists
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail=f"User not found. No user with user_id={user_id}.")
-
-    USER_DIR = UPLOAD_DIR+f'{user.id}/'
-    if not os.path.exists(USER_DIR):
-        os.makedirs(USER_DIR)
+        raise HTTPException(status_code=404, detail=f"User with ID {user_id} not found.")
 
     try:
-        # Create a sub-directory for each zip upload to extract the files into
-        zip_upload_dir = pathlib.Path(USER_DIR) / pathlib.Path(file.filename).stem
-        zip_upload_dir.mkdir(parents=True, exist_ok=True)
-        # Read the uploaded zip file into memory
-        zip_data = await file.read()
-        with zipfile.ZipFile(io.BytesIO(zip_data), 'r') as zip_ref:
-            # Extract all files to the specified directory
-            zip_ref.extractall(USER_DIR)
+        # Define user directory
+        user_dir = pathlib.Path(UPLOAD_DIR) / str(user_id)
+        user_dir.mkdir(parents=True, exist_ok=True)
+        # Save zip file temporarily for extraction
+        temp_zip_path = user_dir / file.filename
+        with open(temp_zip_path, "wb") as temp_zip_file:
+            temp_zip_file.write(await file.read())
 
-            # Remove __MACOSX folder if present
-            macosx_folder = pathlib.Path(USER_DIR) / pathlib.Path("__MACOSX")
-            if macosx_folder.exists() and macosx_folder.is_dir():
-                shutil.rmtree(macosx_folder)
+        # Trigger Celery chain
+        chain_result = (
+            ct.extract_zip_file.s(str(temp_zip_path), str(user_dir)) |
+            ct.upload_to_db.s(user_id=user_id, recording_name=recording_name) |
+            ct.process_data.s()
+        ).apply_async()
 
-            # Save metadata for each extracted file to the database
-            extracted_files = []
-            for filename in zip_ref.namelist():
-                # Ignore __MACOSX
-                if filename.startswith('__MACOSX'):
-                    continue
-                elif filename.endswith(('.csv', '.mov')):
-                    # Only process files extracted from the zip, not the whole UPLOAD_DIR
-                    file_path = pathlib.Path(USER_DIR) / filename
-                    # Save the metadata to the database
-                    new_upload = Upload(
-                        user_id=user_id,
-                        recording_name=recording_name,
-                        filename=os.path.basename(filename),
-                        path=str(file_path)
-                    )
-                    db.add(new_upload)
-                    db.commit()
-                    extracted_files.append({"filename": filename, "path": str(file_path)})
-
-
-        # Return a success response
+        # Return success response
         return UploadResponse(
-            message=f"Files extracted and saved successfully",
+            message="Data uploaded successfully and processing has started.",
             user_name=user.user_name,
             recording_name=recording_name,
-            files=extracted_files
+            task_id=chain_result.id,
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing the file: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing the upload: {str(e)}")

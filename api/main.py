@@ -10,7 +10,7 @@ from starlette.responses import Response
 from api.config import settings
 import api.models as models
 from api.database import engine
-from api.router import posts, upload, users, tasks
+from api.router import upload, users, tasks
 
 
 app = FastAPI()
@@ -20,12 +20,12 @@ celery = Celery(
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND
 )
+celery.conf.broker_connection_retry_on_startup = True
 
 # To create all the tables in the database 
 models.Base.metadata.create_all(bind=engine)
 
 # Here we link the routers
-app.include_router(posts.router)
 app.include_router(users.router)
 app.include_router(upload.router)
 app.include_router(tasks.router)
@@ -39,7 +39,8 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         body = await request.body()
         if len(body) > self.max_request_size:
+            print(f"Request body with size {len(body)}")
             return Response("Request body too large", status_code=413)
         return await call_next(request)
-# Set the max request size to 100 MB
-app.add_middleware(RequestSizeLimitMiddleware, max_request_size=100 * 1024 * 1024)
+# Set the max request size to 200 MB
+app.add_middleware(RequestSizeLimitMiddleware, max_request_size=200 * 1024 * 1024)
