@@ -51,3 +51,30 @@ def edit_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Depen
     db.commit()
     db.refresh(user)
     return user
+
+
+# Get user's uploaded recordings
+@router.get('/{user_id}/recordings', response_model=List[schemas.Recording])
+def get_recordings(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Fetch all recordings associated with the user
+    recordings = (
+        db.query(models.Recording)
+        .join(models.User)  # Join User to get user_name
+        .filter(models.Recording.user_id == user_id)
+        .all()
+    )
+    result = [
+        schemas.Recording(
+            recording_id=recording.id,
+            recording_name=recording.recording_name,
+            user_name=recording.user.user_name,
+            uploaded_at=recording.uploaded_at.isoformat()
+        ) 
+        for recording in recordings
+    ]
+    return result

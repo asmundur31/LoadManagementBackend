@@ -17,22 +17,33 @@ class Post(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 
 
-class Upload(Base):
-    __tablename__ = "uploads"
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    recording_name = Column(String, nullable=False)
-    filename = Column(String, nullable=False)
-    path = Column(String, nullable=False)
-    uploaded_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
-
-    user = relationship("User", back_populates="uploads")
-
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_name = Column(String, nullable=False, unique=True)
+    user_name = Column(String, nullable=False)
 
-    uploads = relationship("Upload", back_populates="user", cascade="all, delete-orphan")
+    recordings = relationship("Recording", back_populates="user", cascade="all, delete-orphan")
+
+
+class Recording(Base):
+    __tablename__ = "recordings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    recording_name = Column(String, nullable=False)
+    uploaded_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+
+    user = relationship("User", back_populates="recordings")
+    uploads = relationship("Upload", back_populates="recording", cascade="all, delete-orphan")
+
+
+class Upload(Base):
+    __tablename__ = "uploads"
+
+    id = Column(Integer, primary_key=True, index=True)
+    recording_id = Column(Integer, ForeignKey("recordings.id", ondelete="CASCADE"), nullable=False)
+    filename = Column(String, nullable=False)
+    path = Column(String, nullable=False)
+
+    recording = relationship("Recording", back_populates="uploads")
