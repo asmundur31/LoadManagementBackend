@@ -10,7 +10,7 @@ from starlette.responses import Response
 from api.config import settings
 import api.models as models
 from api.database import engine
-from api.router import upload, users, tasks
+from api.router import upload, users, tasks, recordings
 
 
 app = FastAPI()
@@ -29,6 +29,7 @@ models.Base.metadata.create_all(bind=engine)
 app.include_router(users.router)
 app.include_router(upload.router)
 app.include_router(tasks.router)
+app.include_router(recordings.router)
 
 # Here is code that allows bigger file uploads (100MB)
 class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
