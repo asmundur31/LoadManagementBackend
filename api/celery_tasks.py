@@ -2,45 +2,21 @@ from celery import shared_task
 import zipfile
 import pathlib
 import shutil
+import os
 
 from api.calc.fib import fib
 from api.models import Upload, Recording
 from api.database import get_db_session
+from api.utils import convert_csv_file_to_json
 
 
 @shared_task
-def extract_zip_file(zip_path: str, extract_to: str) -> str:
-    """
-    Extracts a zip file to the specified directory.
-    """
-    print('Start extraction')
-    try:
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_to)
-        print("extracted the zip")
-        # Clean up temporary zip file
-        pathlib.Path(zip_path).unlink(missing_ok=True)
-
-        # Remove __MACOSX folder if present
-        macosx_folder = pathlib.Path(extract_to) / "__MACOSX"
-        if macosx_folder.exists():
-            shutil.rmtree(macosx_folder)
-
-        return extract_to  # Pass extracted directory to the next task
-    except Exception as e:
-        raise RuntimeError(f"Failed to extract zip file: {e}")
-
-@shared_task
-def upload_to_db(extracted_dir: str, user_id: str, recording_name: str) -> str:
+def upload_recording_to_db(user_id: str, recording_name: str) -> str:
     """
         Uploads the files in the extracted directory.
     """
-    print("Uploading data to db...")
-    recording_dir = pathlib.Path(extracted_dir) / recording_name 
+    print("Uploading recording to db...")
     try:
-        processed_files = []
-        uploads = []
-
         # Use the database session
         with get_db_session() as db:
             new_recording = Recording(
@@ -51,11 +27,61 @@ def upload_to_db(extracted_dir: str, user_id: str, recording_name: str) -> str:
             db.commit()
             # Then we need to generate the id for the new recording
             db.refresh(new_recording)
+
+        return new_recording.to_dict()
+    except Exception as e:
+        raise RuntimeError(f"Failed to upload data: {e}")
+
+
+@shared_task
+def extract_zip_file(recording: dict, zip_path: str, user_dir: str) -> tuple:
+    """
+    Extracts a zip file, converts CSV files to JSON, and removes the original CSV files.
+    """
+    try:
+        # Extract the zip file
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(user_dir)
+        
+        # Clean up temporary zip file
+        pathlib.Path(zip_path).unlink(missing_ok=True)
+
+        # Remove __MACOSX folder if present
+        macosx_folder = pathlib.Path(user_dir) / "__MACOSX"
+        if macosx_folder.exists():
+            shutil.rmtree(macosx_folder)
+
+        # Convert CSV files to JSON
+        target_path = os.path.join(user_dir, recording["recording_name"])
+        for csv_file in pathlib.Path(target_path).rglob("*.csv"):
+            convert_csv_file_to_json(csv_file, recording)
+            # Remove the original CSV file
+            csv_file.unlink()
+
+        return {
+            "target_path": target_path,
+            "recording": recording
+        }
+    except Exception as e:
+        raise RuntimeError(f"Failed to extract and process zip file: {e}")
+
+@shared_task
+def upload_files_to_db(path_recording: dict) -> dict:
+    """
+        Uploads the files in the extracted directory.
+    """
+    print("Uploading files to db...")
+    target_path = path_recording["target_path"]
+    recording = path_recording["recording"]
+    try:
+        processed_files = []
+        uploads = []
+
         with get_db_session() as db:
-            for file_path in recording_dir.rglob("*"):
-                if file_path.is_file() and file_path.suffix in {".csv", ".mov"}:
+            for file_path in pathlib.Path(target_path).rglob("*"):
+                if file_path.is_file() and file_path.suffix in {".json", ".mov"}:
                     new_upload = Upload(
-                        recording_id=new_recording.id,
+                        recording_id=recording["id"],
                         filename=file_path.name,
                         path=str(file_path)
                     )
@@ -64,17 +90,17 @@ def upload_to_db(extracted_dir: str, user_id: str, recording_name: str) -> str:
             db.add_all(uploads)
             db.commit()
 
-        return new_recording.id
+        return recording
     except Exception as e:
         raise RuntimeError(f"Failed to upload data: {e}")
 
 @shared_task
-def process_data(recording_id: str):
+def process_data(recording: dict) -> str:
     """
         Processes the data of a recording
     """
-    print(f"Processing data of recording with id={recording_id}...")
-    return f"Finnished processing recording {recording_id}"
+    print(f"Processing data of recording with id={recording["id"]}...")
+    return f"Finnished processing recording {recording["id"]}"
 
 @shared_task
 def dummy_test(num: int):

@@ -1,6 +1,8 @@
 '''
     This module is for all endpoints under the /users endpoint.
 '''
+import os
+import shutil
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from sqlalchemy.orm import Session
@@ -78,3 +80,35 @@ def get_recordings(user_id: int, db: Session = Depends(get_db)):
         for recording in recordings
     ]
     return result
+
+# Delete user's recording
+@router.delete('/{user_id}/recordings/{recording_id}', response_model=schemas.RecordingWithUser)
+def delete_recordings(user_id: int, recording_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    recording = db.query(models.Recording).filter(models.Recording.user_id == user_id, models.Recording.id == recording_id).first()
+    if not recording:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    
+    # Store the recording details before deleting
+    deleted_recording = schemas.RecordingWithUser(
+        recording_id=recording.id,
+        recording_name=recording.recording_name,
+        user_name=recording.user.user_name,
+        uploaded_at=recording.uploaded_at.isoformat()
+    )
+
+    # Construct the directory path
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/raw'))
+    dir_path = os.path.join(base_dir, str(user_id), recording.recording_name)
+    
+    # Delete the recording directory from the filesystem
+    if os.path.exists(dir_path):
+        shutil.rmtree(dir_path)
+    
+    # Delete the recording
+    db.delete(recording)
+    db.commit()
+    
+    return deleted_recording

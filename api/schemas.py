@@ -34,6 +34,13 @@ class Recording(BaseModel):
     class Config:
         from_attributes = True
 
+class RecordingWithZip(BaseModel):
+    recording: Recording
+    zip_url: str
+
+    class Config:
+        from_attributes = True
+
 
 class RecordingWithUser(BaseModel):
     recording_id: int
@@ -44,6 +51,12 @@ class RecordingWithUser(BaseModel):
     class Config:
         from_attributes = True
 
+class RecordingWithZipAndUser(BaseModel):
+    recording: RecordingWithUser
+    zip_url: str
+
+    class Config:
+        from_attributes = True
 
 class FileMetadata(BaseModel):
     filename: str
