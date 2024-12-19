@@ -2,8 +2,7 @@
     This module is to define the schema for data validation.
 '''
 from pydantic import BaseModel
-from typing import List
-from datetime import date
+from datetime import datetime
 
 ### User schemas
 class Users(BaseModel):
@@ -27,6 +26,16 @@ class UserUpdate(BaseModel):
 
 ### Recording schemas
 class Recording(BaseModel):
+    id: int
+    user_id: int
+    recording_name: str
+    uploaded_at: datetime 
+
+    class Config:
+        from_attributes = True
+
+
+class RecordingWithUser(BaseModel):
     recording_id: int
     recording_name: str
     user_name: str

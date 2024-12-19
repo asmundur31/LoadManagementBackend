@@ -54,7 +54,7 @@ def edit_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Depen
 
 
 # Get user's uploaded recordings
-@router.get('/{user_id}/recordings', response_model=List[schemas.Recording])
+@router.get('/{user_id}/recordings', response_model=List[schemas.RecordingWithUser])
 def get_recordings(user_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     
@@ -69,7 +69,7 @@ def get_recordings(user_id: int, db: Session = Depends(get_db)):
         .all()
     )
     result = [
-        schemas.Recording(
+        schemas.RecordingWithUser(
             recording_id=recording.id,
             recording_name=recording.recording_name,
             user_name=recording.user.user_name,
