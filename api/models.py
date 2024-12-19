@@ -37,7 +37,15 @@ class Recording(Base):
     user = relationship("User", back_populates="recordings")
     uploads = relationship("Upload", back_populates="recording", cascade="all, delete-orphan")
 
-
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "recording_name": self.recording_name,
+            "uploaded_at": self.uploaded_at.isoformat() if self.uploaded_at else None
+        }
+    
+    
 class Upload(Base):
     __tablename__ = "uploads"
 

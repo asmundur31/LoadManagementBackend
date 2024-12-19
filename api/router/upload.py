@@ -38,6 +38,11 @@ async def upload_directory(
     if not user:
         raise HTTPException(status_code=404, detail=f"User with ID {user_id} not found.")
 
+    # Ensure user does not have recording name that exist
+    recording = db.query(Recording).filter(Recording.user_id == user.id, Recording.recording_name == recording_name).first()
+    if recording:
+        raise HTTPException(status_code=404, detail=f"Recording with recording name {recording_name} already exists.")
+    
     try:
         # Define user directory
         user_dir = pathlib.Path(UPLOAD_DIR) / str(user_id)
@@ -49,8 +54,9 @@ async def upload_directory(
 
         # Trigger Celery chain
         chain_result = (
+            ct.upload_recording_to_db.s(user_id=user_id, recording_name=recording_name) |
             ct.extract_zip_file.s(str(temp_zip_path), str(user_dir)) |
-            ct.upload_to_db.s(user_id=user_id, recording_name=recording_name) |
+            ct.upload_files_to_db.s() |
             ct.process_data.s()
         ).apply_async()
 
