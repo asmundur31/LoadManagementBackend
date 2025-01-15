@@ -15,7 +15,7 @@ jobs:
                 username: ${{ secrets.DOCKER_USERNAME }}
                 password: ${{ secrets.DOCKER_PASSWORD }}
             - name: Build and push Docker images using Docker Compose
-                uses: 0x4r45h/docker-compose-ci@v0.1.0
-                with:
-                  docker_compose_files: '-f docker-compose.yml'
-                  services: 'fastapi postgres redis celery'  # Replace with your service names
+              uses: 0x4r45h/docker-compose-ci@v0.1.0
+              with:
+                docker_compose_files: '-f docker-compose.yml'
+                services: 'fastapi postgres redis celery'
