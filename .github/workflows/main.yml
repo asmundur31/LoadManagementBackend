@@ -1,5 +1,5 @@
 name: kthcloud-ci
-"on":
+on:
     push:
         branches:
             - main
