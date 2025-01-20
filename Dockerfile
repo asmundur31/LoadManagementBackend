@@ -17,6 +17,9 @@ COPY . /app/
 # Set the environment variable to your app's entry point
 ENV PYTHONPATH=/app
 
+# Install Nginx
+RUN apt-get install -y nginx
+
 # Expose the port FastAPI will run on
 EXPOSE 8000
 EXPOSE 80
