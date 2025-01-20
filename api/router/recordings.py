@@ -3,6 +3,7 @@
 '''
 import os
 import zipfile
+import shutil
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from typing import List
@@ -65,3 +66,24 @@ def download_zip(zip_filename: str):
     if not os.path.exists(zip_filepath):
         raise HTTPException(status_code=404, detail="Zip file not found")
     return FileResponse(zip_filepath, filename=zip_filename, media_type='application/zip')
+
+# Delete recording by id
+@router.delete('/{recording_id}', response_model=schemas.Recording)
+def delete_recording(recording_id: int, db: Session = Depends(get_db)):
+    recording = db.query(models.Recording).filter(models.Recording.id == recording_id).first()
+    if not recording:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    
+    # Construct the directory path
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/raw'))
+    dir_path = os.path.join(base_dir, str(recording.user_id), recording.recording_name)
+    
+    # Delete the directory and its contents
+    if os.path.exists(dir_path):
+        shutil.rmtree(dir_path)
+    
+    # Delete the recording from the database
+    db.delete(recording)
+    db.commit()
+    
+    return recording
