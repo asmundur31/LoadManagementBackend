@@ -1,5 +1,5 @@
 # Use the official Python image from the DockerHub
-FROM python:3.13-slim AS app
+FROM python:3.13-slim
 
 # Set working directory
 WORKDIR /app
@@ -17,14 +17,8 @@ COPY . /app/
 # Set the environment variable to your app's entry point
 ENV PYTHONPATH=/app
 
-# Stage 2: Add Nginx for reverse proxy
-FROM nginx:alpine
-
-# Copy Nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
 # Expose the port FastAPI will run on
 EXPOSE 8000
 
-# Command to start both Nginx and the app
-CMD ["nginx", "-g", "daemon off;"]
+# Command to run the app
+CMD ["uvicorn", "api.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
