@@ -19,6 +19,10 @@ ENV PYTHONPATH=/app
 
 # Expose the port FastAPI will run on
 EXPOSE 8000
+EXPOSE 80
 
-# Command to run the app
-CMD ["uvicorn", "api.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+# Copy Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Start FastAPI and Nginx together
+CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port 8000 & nginx -g 'daemon off;'"]
