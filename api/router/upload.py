@@ -25,9 +25,7 @@ async def upload_directory(
     db: Session = Depends(get_db)
 ):
     """
-    Endpoint to upload a zipped directory and trigger Celery tasks.
-    - Task 1: Extract files from the zip.
-    - Task 2: Process the extracted files.
+        Endpoint to upload a zipped directory and trigger Celery tasks.
     """
     # Validate file type
     if not file.filename.endswith('.zip'):
