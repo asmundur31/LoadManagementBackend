@@ -4,12 +4,15 @@ FROM python:3.13-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies, including Nginx
+# Install system dependencies and Nginx
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     curl \
-    && curl -fsSL https://nginx.org/packages/mainline/debian/ | tee /etc/apt/sources.list.d/nginx.list \
+    gnupg2 \
+    lsb-release \
+    && echo "deb http://nginx.org/packages/mainline/debian/ $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list \
+    && curl -fsSL https://nginx.org/keys/nginx_signing.key | tee /etc/apt/trusted.gpg.d/nginx.asc \
     && apt-get update \
     && apt-get install -y nginx \
     && rm -rf /var/lib/apt/lists/*
@@ -21,7 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the FastAPI app code
 COPY . /app/
 
-# Expose the FastAPI and Nginx ports
+# Expose FastAPI and Nginx ports
 EXPOSE 8000
 EXPOSE 80
 
