@@ -3,11 +3,12 @@ import zipfile
 import pathlib
 import shutil
 import os
+import json
 
 from api.calc.fib import fib
 from api.models import Upload, Recording
 from api.database import get_db_session
-from api.utils import convert_csv_file_to_json
+from api.utils import convert_annotation_file_to_json, convert_sensor_directory_to_json, fix_timestamps
 
 
 @shared_task
@@ -53,10 +54,17 @@ def extract_zip_file(recording: dict, zip_path: str, user_dir: str) -> tuple:
 
         # Convert CSV files to JSON
         target_path = os.path.join(user_dir, recording["recording_name"])
-        for csv_file in pathlib.Path(target_path).rglob("*.csv"):
-            convert_csv_file_to_json(csv_file, recording)
-            # Remove the original CSV file
-            csv_file.unlink()
+        
+        # Process the annotation file
+        date_dir = next(pathlib.Path(target_path).iterdir())
+        annotation_files = list(date_dir.glob("Annotations*.csv"))
+        if annotation_files:
+            convert_annotation_file_to_json(annotation_files[0], recording)
+        
+        # Process each sensor directory
+        for sensor_dir in date_dir.iterdir():
+            if sensor_dir.is_dir():
+                convert_sensor_directory_to_json(sensor_dir, recording)
 
         return {
             "target_path": target_path,
@@ -90,17 +98,37 @@ def upload_files_to_db(path_recording: dict) -> dict:
             db.add_all(uploads)
             db.commit()
 
-        return recording
+        return path_recording 
     except Exception as e:
         raise RuntimeError(f"Failed to upload data: {e}")
 
 @shared_task
-def process_data(recording: dict) -> str:
+def process_data(path_recording: dict) -> str:
     """
         Processes the data of a recording
     """
-    print(f"Processing data of recording with id={recording["id"]}...")
-    return f"Finnished processing recording {recording["id"]}"
+    recording = path_recording["recording"]
+    target_path = path_recording["target_path"]
+    print(f"Processing data of recording with id={recording['id']}...")
+
+    # Fetch and process each JSON file
+    for json_file in pathlib.Path(target_path).rglob("*.json"):
+        with open(json_file, 'r') as f:
+            data = json.load(f)
+        
+        if "data" in data:
+            sensor_data = data["data"]
+            timestamps = sensor_data["timestamp"]
+
+            # Implement your logic to fix the timestamps here
+            fixed_timestamps = fix_timestamps(timestamps)
+            data["data"]["timestamp"] = fixed_timestamps
+
+            # Save the updated JSON data back to the file
+            with open(json_file, 'w') as f:
+                json.dump(data, f, indent=4)
+
+    return f"Finished processing recording {recording['id']}"
 
 @shared_task
 def dummy_test(num: int):
