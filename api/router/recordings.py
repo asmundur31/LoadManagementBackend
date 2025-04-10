@@ -40,7 +40,7 @@ def get_recording(recording_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Recording directory not found")
     
     # Create a zip file
-    zip_filename = f"{recording.recording_name}_{recording.id}.zip"
+    zip_filename = f"{recording.user_id}_{recording.id}.zip"
     zip_filepath = os.path.join(base_dir, zip_filename)
     with zipfile.ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for root, _, files in os.walk(dir_path):
@@ -50,7 +50,7 @@ def get_recording(recording_id: int, db: Session = Depends(get_db)):
                 zipf.write(file_path, arcname=arcname)
     
     # Construct the zip file URL
-    zip_url = f"/recordings/download/{zip_filename}"
+    zip_url = f"recordings/download/{zip_filename}"
     
     # Return the recording data and the zip file URL
     return {
@@ -85,5 +85,11 @@ def delete_recording(recording_id: int, db: Session = Depends(get_db)):
     # Delete the recording from the database
     db.delete(recording)
     db.commit()
+
+    # Delete the zip file if it exists
+    zip_filename = f"{recording.user_id}_{recording.id}.zip"
+    zip_filepath = os.path.join(base_dir, zip_filename)
+    if os.path.exists(zip_filepath):
+        os.remove(zip_filepath)
     
     return recording

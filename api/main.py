@@ -44,4 +44,4 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
             return Response("Request body too large", status_code=413)
         return await call_next(request)
 # Set the max request size to 200 MB
-app.add_middleware(RequestSizeLimitMiddleware, max_request_size=200 * 1024 * 1024)
+app.add_middleware(RequestSizeLimitMiddleware, max_request_size=1000 * 1024 * 1024)
