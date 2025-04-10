@@ -15,18 +15,17 @@ def convert_annotation_file_to_json(csv_file: Path, recording: dict):
         for row in reader:
             for header in headers:
                 if header == "Timestamp":
-                    print(row[header])
                     data[header.lower()].append(float(row[header]))
                 else:
                     data[header.lower()].append(row[header])
         json_data = {
             "recording_info": {
-                "recording_id": recording["id"],
+                "recording_id": str(recording["id"]),
                 "recording_name": recording["recording_name"],
-                "user_id": recording["user_id"],
+                "user_id": str(recording["user_id"]),
                 "frequency": 1/104.0
             },
-            "data": data
+            "recording_data": data
         }
         json.dump(json_data, json_f, indent=4)  # Write JSON
         csv_file.unlink()
@@ -35,7 +34,6 @@ def convert_sensor_directory_to_json(directory_path: Path, recording: dict):
     data = {}
     timestamp_added = False
     for csv_file in directory_path.glob("*.csv"):
-        print(f"Processing {csv_file}")
         with open(csv_file, 'r') as csv_f:
             next(csv_f) # Skip the first header line
             reader = csv.DictReader(csv_f)
@@ -43,7 +41,9 @@ def convert_sensor_directory_to_json(directory_path: Path, recording: dict):
             for header in headers:
                 if header.lower() not in data:
                     data[header.lower()] = []
-            for row in reader:
+            
+            rows = list(reader)
+            for row in rows[:-4]: # Process all but the last 4 rows
                 for header in headers:
                     if header == "Timestamp":
                         if not timestamp_added:
@@ -56,13 +56,13 @@ def convert_sensor_directory_to_json(directory_path: Path, recording: dict):
     
     json_data = {
         "recording_info": {
-            "recording_id": recording["id"],
+            "recording_id": str(recording["id"]),
             "recording_name": recording["recording_name"],
-            "user_id": recording["user_id"],
+            "user_id": str(recording["user_id"]),
             "sensor_name": directory_path.name,
             "frequency": 1/104.0
-        },
-        "data": data
+            },
+        "recording_data": data
     }
 
     json_file_path = directory_path.with_suffix('.json')
@@ -82,11 +82,6 @@ def fix_timestamps(timestamps: list):
     for i in range(1, len(timestamps)):
         if timestamps[i] != timestamps[i - 1]:
             n = i - j  # Number of datapoints
-            print(f"i: {i}")
-            print(f"Frequency: {(timestamps[i] - timestamps[i - 1])}")
-            print(f"timestamp i: {timestamps[i]}")
-            print(f"timestamp i-1: {timestamps[i - 1]}")
-            print(f"n: {n}")
             frequencyNow = (timestamps[i] - timestamps[i - 1]) / n
             j = i - n
             while j < i - 1:
