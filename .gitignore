@@ -66,3 +66,4 @@ data/*
 !data/
 static/*
 !static/
+!static/camera_calibration.npz
