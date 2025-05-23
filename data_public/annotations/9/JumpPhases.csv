@@ -1,4 +1,4 @@
-Landing type,Timestamp (ms),Phase
+Landing type,Timestamp (s),Phase
 Comp,1742669290.9468513,Run-up Phase Start
 Comp,1742669289.9912546,Static Phase Start
 Comp,1742669294.320802,Injump Phase Start
@@ -111,3 +111,10 @@ Semi,1742671363.542624,Rebound Phase Start
 Semi,1742671363.637929,Flight Phase Start
 Semi,1742671365.0992708,Landing Phase Start
 Semi,1742671366.6767786,Landing Phase End
+Comp,1742669221.671683,Run-up Phase Start
+Comp,1742669235.2614071,Injump Phase Start
+Comp,1742669235.7049031,Loading Phase Start
+Comp,1742669235.7802138,Rebound Phase Start
+Comp,1742669235.9057317,Flight Phase Start
+Comp,1742669237.111037,Landing Phase Start
+Comp,1742669237.964558,Landing Phase End
