@@ -1,4 +1,4 @@
-Landing type,Timestamp (ms),Phase
+Landing type,Timestamp (s),Phase
 Comp,1743791600.4257073,Run-up Phase Start
 Comp,1743791599.138616,Static Phase Start
 Comp,1743791603.4227457,Injump Phase Start

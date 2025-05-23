@@ -5,7 +5,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - ./api:/app/api
+      - ./trampette_analysis:/app/trampette_analysis
+      - ./static:/app/static
       - ./data:/app/data
     depends_on:
       - postgres
@@ -35,7 +37,9 @@ services:
     build: .
     container_name: celery_worker
     volumes:
-      - .:/app
+      - ./api:/app/api
+      - ./trampette_analysis:/app/trampette_analysis
+      - ./static:/app/static
       - ./data:/app/data
     command: >
       watchmedo auto-restart --directory=/app --pattern=*.py --recursive -- celery -A api.main:celery worker --loglevel=info
