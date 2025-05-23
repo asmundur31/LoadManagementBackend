@@ -222,7 +222,6 @@ def process_data(path_recording: dict) -> str:
             data = json.load(f)
         if "recording_info" in data:
             data["recording_info"]["jump_count"] = jump_count
-
             # Save the updated JSON data back to the file
             with open(json_file, 'w') as f:
                 json.dump(data, f, indent=4)
