@@ -39,30 +39,34 @@ def save_annotations():
 
 # Path to the CSV file containing sensor placement information
 sensor_placement_csv_path = "/Users/asmundur/Developer/MasterThesis/data/annotations/sensorPlacement.csv"
-sensor_data_df = pd.read_csv(sensor_placement_csv_path)
+sensor_placement_df = pd.read_csv(sensor_placement_csv_path)
 
 # Load IMU Data
 subject_id = 7
-sensor_placement = "chest"
+data_type = "acc"
+sensor_placement = "lower_back"
 landing_type = "Soft"
 
 
 # Find the correct sensor name based on subject_id and sensor_placement
-sensor_name = sensor_data_df.loc[
-    (sensor_data_df['Subject Id'] == subject_id) & 
-    (sensor_data_df['Placement'] == sensor_placement),
+sensor_name = sensor_placement_df.loc[
+    (sensor_placement_df['Subject Id'] == subject_id) & 
+    (sensor_placement_df['Placement'] == sensor_placement),
     'Sensor'
 ].values[0]
 
 # Build the IMU data path dynamically
 imu_data_path = f"/Users/asmundur/Developer/MasterThesis/data_public/raw/Protocol data/{subject_id}/{sensor_name}.json"
-video_start_path = f"/Users/asmundur/Developer/MasterThesis/data/annotations/{subject_id}/VideoStartTime.csv"
+video_start_path = f"/Users/asmundur/Developer/MasterThesis/data/annotations/VideoStartTime.csv"
 
 df = load_json(imu_data_path)
 
 # Load video
 df_video_start = pd.read_csv(video_start_path)
-video_start_data = df_video_start[df_video_start["Landing type"] == landing_type]
+video_start_data = df_video_start[
+    (df_video_start["Landing type"] == landing_type) &
+    (df_video_start["Subject Id"] == subject_id)
+]
 video_path = video_start_data["Video"].values[0]  # Get video path
 cap = cv2.VideoCapture(video_path)
 fps = cap.get(cv2.CAP_PROP_FPS)
@@ -82,9 +86,9 @@ if os.path.isfile(annotations_path):
 
 timestamps = df["timestamp"]
 print(timestamps[0])
-acc_x = df["accx"]
-acc_y = df["accy"]
-acc_z = df["accz"]
+acc_x = df[f"{data_type}x"]
+acc_y = df[f"{data_type}y"]
+acc_z = df[f"{data_type}z"]
 
 window_size = 10
 max_window_size = 30
@@ -104,9 +108,6 @@ phase_labels = {
 }
 
 fig, ax = plt.subplots(figsize=(10, 5))
-ax.set_xlabel("Time (ms)")
-ax.set_ylabel("Acceleration (m/s²)")
-ax.set_title("IMU Data & Video")
 
 # OpenCV video window
 cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
@@ -138,6 +139,15 @@ def update_plot():
     mask = (timestamps >= current_start) & (timestamps <= current_end)
 
     ax.clear()
+    ax.set_xlabel("Time (s)")
+    if data_type == "acc":
+        ax.set_ylabel("Acceleration (m/s²)")
+    elif data_type == "gyro":
+        ax.set_ylabel("Angular velocity (°/s)")
+    else:
+        ax.set_ylabel("Magnetic field (µT)")
+
+    ax.set_title("IMU Data & Video")
     ax.plot(timestamps[mask], acc_x[mask], label="X-axis", color="r")
     ax.plot(timestamps[mask], acc_y[mask], label="Y-axis", color="g")
     ax.plot(timestamps[mask], acc_z[mask], label="Z-axis", color="b")
@@ -145,7 +155,7 @@ def update_plot():
     for (landing_type, time, label) in annotations:
         if current_start <= time <= current_end:
             ax.axvline(time, color="k", linestyle="--")
-            ax.text(time, np.max([acc_x, acc_y, acc_z]), label, color="black", rotation=45)
+            #ax.text(time, np.max([acc_x, acc_y, acc_z]), label, color="black", rotation=45)
 
     ax.set_xlim(current_start, current_end)
     ax.set_ylim(min(np.min(acc_x), np.min(acc_y), np.min(acc_z)), 
