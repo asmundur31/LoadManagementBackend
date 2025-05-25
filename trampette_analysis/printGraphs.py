@@ -9,6 +9,25 @@ def main():
     subjects = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9']
     base_path = 'data_public/processed/'
 
+    # Trampette time
+    df = pd.read_csv(base_path+'time_in_trampette_results.csv')
+    grouped = df.groupby("test_subject")["time_in_trampette"].apply(list)
+    padded = list(zip_longest(*grouped.values, fillvalue=np.nan))
+    time_in_trampette = np.array(padded).T
+    submax_indices = [0, 1, 4, 5, 8, 9]
+    nearmax_indices = [2, 3, 6, 7, 10, 11]
+
+    sub_max_time = time_in_trampette[:, submax_indices]
+    near_max_time = time_in_trampette[:, nearmax_indices]
+    t_test = perform_t_test(sub_max_time, near_max_time)
+
+    print("=================================")
+    print("Time in trampette")
+    print("T-test Results:")
+    print(t_test)
+    print()
+    plot_jump_intensity_results(subjects, sub_max_time, near_max_time, title="Time in trampette results", y_label="Time (s)", x_label="Subjects", legend_labels=["Sub-maximal", "Near-maximal"])
+    
     # Velocity intensity
     df = pd.read_csv(base_path+'velocity_results.csv')
     grouped = df.groupby("test_subject")["fss"].apply(list)
