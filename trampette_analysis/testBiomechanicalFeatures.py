@@ -35,7 +35,7 @@ def main():
             subject_jump_features(subject_id, jump_nr, results)
     
     summary_df = pd.DataFrame(results)
-    summary_df.to_csv("data_public/processed/energy_results.csv", index=False)
+    summary_df.to_csv("data_public/processed/time_in_trampette_results.csv", index=False)
 
 
 def subject_jump_features(id, jump_nr, results):
@@ -147,12 +147,12 @@ def subject_jump_features(id, jump_nr, results):
         interactive_plot(jump_imu_df_earth, columns=[f'lower_back_accx', 'lower_back_accy', 'lower_back_accz'], window_size=1000, title="Jerk")
 
     ### IMPULSE ###
-    if 0:
+    if 1:
         placements = ['lower_back']
         acc_cols, _, _ = create_sensor_columns(placements, ['acc'])
         jump_imu_df_earth = butterworth_filter_low(jump_imu_df_earth, columns=acc_cols, cutoff=10)
         jump_imu_df_earth = butterworth_filter_high(jump_imu_df_earth, columns=acc_cols, cutoff=0.1)
-        interactive_plot(jump_imu_df_earth, columns=[f'lower_back_accz', 'label'], window_size=1000, title="Jerk")
+        #interactive_plot(jump_imu_df_earth, columns=[f'lower_back_accz', 'label'], window_size=1000, title="Jerk")
         jump_imu_df_earth = impulse(jump_imu_df_earth, id, 'lower_back', fs=104.0)
         jump_imu_df_earth = butterworth_filter_high(jump_imu_df_earth, columns=['lower_back_vertical_impulse'], cutoff=0.5)
         # Get the net impulse during takeoff
@@ -230,7 +230,7 @@ def subject_jump_features(id, jump_nr, results):
         })
 
     ### ENERGY ###
-    if 1:
+    if 0:
         placements = ['lower_back']
         _, gyr_cols, _ = create_sensor_columns(placements, ['gyro'])
         jump_imu_df_earth = butterworth_filter_low(jump_imu_df_earth, columns=gyr_cols, cutoff=10)

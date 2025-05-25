@@ -1,0 +1,106 @@
+test_subject,jump_nr,landing,trial,time_in_trampette
+7,2,Competition,Sub max,0.17574977799998237
+7,3,Competition,Sub max,0.1767501829999958
+7,4,Competition,Near max,0.16587519600000178
+7,5,Competition,Near max,0.1757502550000254
+7,6,Soft pit,Sub max,0.18487477299993316
+7,7,Soft pit,Sub max,0.1768751140000404
+7,8,Soft pit,Near max,0.15725016599992614
+7,9,Soft pit,Near max,0.1849999429999798
+7,10,Semi in Soft pit,Sub max,0.18650007300004745
+7,11,Semi in Soft pit,Sub max,0.195999860000029
+7,12,Semi in Soft pit,Near max,0.1664998530000048
+7,13,Semi in Soft pit,Near max,0.18424963900019975
+8,3,Competition,Sub max,0.17674994399999377
+8,4,Competition,Sub max,0.1675000189999878
+8,5,Competition,Near max,0.17674994500004004
+8,6,Competition,Near max,0.1675000199999772
+8,7,Soft pit,Sub max,0.17575001700004123
+8,8,Soft pit,Sub max,0.16562533399996937
+8,9,Soft pit,Near max,0.15700006399993072
+8,10,Soft pit,Near max,0.16825032200006262
+8,11,Semi in Soft pit,Sub max,0.1849999429998661
+8,12,Semi in Soft pit,Sub max,0.1674997809998331
+8,13,Semi in Soft pit,Near max,0.17574977799995395
+8,14,Semi in Soft pit,Near max,0.16637492200015913
+9,3,Competition,Sub max,0.1757500170000128
+9,4,Competition,Sub max,0.1665000919999784
+9,5,Competition,Near max,0.15724992699995255
+9,6,Competition,Near max,0.1767497060000096
+9,7,Soft pit,Sub max,0.16650009099998897
+9,8,Soft pit,Sub max,0.16637492199993176
+9,9,Soft pit,Near max,0.1757500170001549
+9,10,Soft pit,Near max,0.17499971400002323
+9,11,Semi in Soft pit,Sub max,0.1846251490001123
+9,12,Semi in Soft pit,Sub max,0.18425011699991956
+9,13,Semi in Soft pit,Near max,0.1658751959998881
+9,14,Semi in Soft pit,Near max,0.17512488400006987
+10,3,Competition,Sub max,0.18687486700002864
+10,4,Competition,Sub max,0.1942498689999752
+10,5,Competition,Near max,0.17575025600001482
+10,6,Competition,Near max,0.18612527900006626
+10,8,Soft pit,Sub max,0.18637490299988713
+10,10,Soft pit,Near max,0.18600010899990593
+10,11,Soft pit,Near max,0.17537474600021596
+10,12,Semi in Soft pit,Sub max,0.1757500170001549
+10,13,Semi in Soft pit,Sub max,0.1748747819997334
+10,14,Semi in Soft pit,Near max,0.17675018299996736
+10,16,Semi in Soft pit,Near max,0.17574977899994337
+11,1,Competition,Sub max,0.1952495570000039
+11,2,Competition,Sub max,0.19525003399999719
+11,4,Competition,Near max,0.17575001800003065
+11,5,Competition,Near max,0.18599987100003545
+11,6,Soft pit,Sub max,0.17575001699992754
+11,7,Soft pit,Sub max,0.19424986800004262
+11,8,Soft pit,Near max,0.18600034900009632
+11,9,Soft pit,Near max,0.18500018100007765
+11,10,Semi in Soft pit,Sub max,0.18500018099985027
+11,11,Semi in Soft pit,Sub max,0.1849999429998661
+11,12,Semi in Soft pit,Near max,0.18687486599992553
+11,13,Semi in Soft pit,Near max,0.18599986999993234
+12,1,Competition,Sub max,0.194249868
+12,2,Competition,Sub max,0.1773748399999988
+12,3,Competition,Near max,0.17575001699998438
+12,4,Competition,Near max,0.16775011999999379
+12,5,Semi in Soft pit,Sub max,0.16750001899993094
+12,6,Semi in Soft pit,Sub max,0.18599963200006187
+12,7,Semi in Soft pit,Near max,0.17675042200005464
+12,8,Semi in Soft pit,Near max,0.17675018299996736
+12,9,Soft pit,Sub max,0.1849997040001199
+12,10,Soft pit,Sub max,0.16749977999984367
+12,11,Soft pit,Near max,0.17574977799995395
+12,12,Soft pit,Near max,0.16562509499999578
+13,1,Competition,Sub max,0.18499970499999563
+13,2,Competition,Sub max,0.17749977100001502
+13,3,Competition,Near max,0.17549991600003523
+13,4,Competition,Near max,0.17674994500004004
+13,5,Semi in Soft pit,Sub max,0.17675018200009163
+13,6,Semi in Soft pit,Sub max,0.17699980800000503
+13,7,Semi in Soft pit,Near max,0.17575001699992754
+13,8,Semi in Soft pit,Near max,0.17525005400000282
+13,9,Soft pit,Sub max,0.1770000459999892
+13,10,Soft pit,Sub max,0.18424987799994597
+13,14,Soft pit,Near max,0.18612527799996315
+14,2,Competition,Sub max,0.1642498970000048
+14,3,Competition,Sub max,0.1733751299999824
+14,4,Competition,Near max,0.1733751290000214
+14,5,Competition,Near max,0.1551249020000114
+14,6,Semi in Soft pit,Sub max,0.17337513000006766
+14,7,Semi in Soft pit,Sub max,0.16525006300003042
+14,8,Semi in Soft pit,Near max,0.16424965900000643
+14,9,Semi in Soft pit,Near max,0.1459999080000216
+14,10,Soft pit,Sub max,0.16425013499997476
+14,11,Soft pit,Sub max,0.1642498969999906
+14,12,Soft pit,Near max,0.1642498969999906
+14,13,Soft pit,Near max,0.1551251409998713
+15,1,Competition,Sub max,0.17337465299999621
+15,2,Competition,Sub max,0.1642498969999906
+15,3,Competition,Near max,0.1642501350000316
+15,4,Competition,Near max,0.1551249030000008
+15,5,Semi in Soft pit,Sub max,0.1642498969999906
+15,6,Semi in Soft pit,Sub max,0.1824998859999596
+15,7,Semi in Soft pit,Near max,0.17337465299999621
+15,8,Semi in Soft pit,Near max,0.17337489099998038
+15,9,Soft pit,Sub max,0.17337512999984028
+15,10,Soft pit,Sub max,0.17337536899981387
+15,11,Soft pit,Near max,0.1642501359999642
