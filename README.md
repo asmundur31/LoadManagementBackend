@@ -92,3 +92,7 @@ To remove volumes (⚠️ including database data):
 ```bash
 docker-compose down -v
 ```
+
+# Upload data
+
+To use this backend a frontend app has been developed that is available here [Load Management Frontend](https://github.com/asmundur31/LoadManagement)
