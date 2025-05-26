@@ -96,3 +96,7 @@ docker-compose down -v
 # Upload data
 
 To use this backend a frontend app has been developed that is available here [Load Management Frontend](https://github.com/asmundur31/LoadManagement)
+
+# Contact
+
+If any questions about this repository or the project please contact the creator at: asmundur31@gmail.com
