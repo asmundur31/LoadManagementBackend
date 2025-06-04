@@ -71,3 +71,4 @@ static/*
 
 # Due to signed NDA the machine learning is not included in the repository
 trampette_analysis/ml/
+LoadManagementBackend.git/
