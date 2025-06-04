@@ -14,7 +14,7 @@ gyro_cols = ['lower_back_gyrox', 'lower_back_gyroy', 'lower_back_gyroz', 'chest_
 magn_cols = ['lower_back_magnx', 'lower_back_magny', 'lower_back_magnz', 'chest_magnx', 'chest_magny', 'chest_magnz', 'thigh_magnx', 'thigh_magny', 'thigh_magnz', 'shin_magnx', 'shin_magny', 'shin_magnz']
 
 def main():
-    subject_ids = [7, 8, 9, 10, 11, 12, 13, 14, 15]
+    subject_ids = [13, 7, 8, 9, 10, 11, 12, 14, 15]
     results = []
 
     # Get the results

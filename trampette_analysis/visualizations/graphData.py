@@ -34,8 +34,8 @@ def interactive_plot(df: pd.DataFrame, columns, vertical_lines=None, window_size
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
         if vertical_lines:
-            ax.axvline(x=[vertical_lines[0]], color='r', linestyle='--', label='Takeoff')
-            ax.axvline(x=[vertical_lines[1]], color='g', linestyle='--', label='Landing')
+            for line in vertical_lines:
+                ax.axvline(x=[line], linestyle='--')
         fig.canvas.draw_idle()
 
     def on_key(event):

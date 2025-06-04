@@ -50,8 +50,10 @@ def jerk(sensor_df: pd.DataFrame, placement: str, fs: float) -> pd.DataFrame:
     df = sensor_df.copy()
     acc = df[[f'{placement}_accx', f'{placement}_accy', f'{placement}_accz']].to_numpy()
     jerk = np.gradient(acc, axis=0) * fs
+    acc = np.gradient(acc, axis=0)
     jerk_magnitude = np.linalg.norm(jerk, axis=1)
     df[f"{placement}_jerk_magnitude"] = jerk_magnitude
+    df[f"{placement}_acc_magnitude"] = np.linalg.norm(acc, axis=1)
     return df
 
 def impulse(sensor_df: pd.DataFrame, subject_id: int, placement: str, fs: float) -> pd.DataFrame:

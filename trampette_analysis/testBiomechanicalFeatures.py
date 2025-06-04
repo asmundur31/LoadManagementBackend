@@ -120,7 +120,7 @@ def subject_jump_features(id, jump_nr, results):
         
 
     ### JERK ###
-    if 0:
+    if 1:
         placements = ['lower_back']
         acc_cols, _, _ = create_sensor_columns(placements, ['acc'])
         jump_imu_df_earth = butterworth_filter_low(jump_imu_df_earth, columns=acc_cols, cutoff=10)
@@ -143,11 +143,16 @@ def subject_jump_features(id, jump_nr, results):
             "max_takeoff_jerk": max_takeoff_jerk,
             "max_landing_jerk": max_landing_jerk
         })
-        interactive_plot(jump_imu_df_earth, columns=[f'lower_back_jerk_magnitude'], window_size=1000, title="Jerk")
-        interactive_plot(jump_imu_df_earth, columns=[f'lower_back_accx', 'lower_back_accy', 'lower_back_accz'], window_size=1000, title="Jerk")
+        t_first_idx = np.argmax(takeoff_mask)  # First True
+        t_last_idx = len(takeoff_mask) - np.argmax(takeoff_mask[::-1]) - 1
+        l_first_idx = np.argmax(landing_mask) 
+        l_last_idx = len(landing_mask) - np.argmax(landing_mask[::-1]) - 1        
+        interactive_plot(jump_imu_df_earth, columns=[f'lower_back_jerk_magnitude'], window_size=1000, title="Jerk", x_label="Time (s)", y_label="Jerk (m/s^3)")
+        interactive_plot(jump_imu_df_earth, columns=['lower_back_accz'], vertical_lines=[t_first_idx,t_last_idx,l_first_idx,l_last_idx], window_size=1000, title="Acceleration", x_label="Time (s)", y_label="Acceleration (m/s^2)")
+        interactive_plot(jump_imu_df_earth, columns=[f'lower_back_acc_magnitude'], window_size=1000, title="Acceleration", x_label="Time (s)", y_label="Acceleration (m/s^2)")
 
     ### IMPULSE ###
-    if 1:
+    if 0:
         placements = ['lower_back']
         acc_cols, _, _ = create_sensor_columns(placements, ['acc'])
         jump_imu_df_earth = butterworth_filter_low(jump_imu_df_earth, columns=acc_cols, cutoff=10)
@@ -175,7 +180,7 @@ def subject_jump_features(id, jump_nr, results):
             "net_takeoff_impulse": net_takeoff_impulse,
             "net_landing_impulse": net_landing_impulse
         })
-        #interactive_plot(jump_imu_df_earth, columns=['lower_back_vertical_impulse', 'lower_back_accx', 'lower_back_accy', 'lower_back_accz'], window_size=1000, title="Vertical impulse")
+        interactive_plot(jump_imu_df_earth, columns=['lower_back_vertical_impulse'], window_size=1000, title="Vertical impulse")
     
     
     ### JUMP HEIGHT ###
@@ -199,7 +204,7 @@ def subject_jump_features(id, jump_nr, results):
             jump_imu_df_earth = butterworth_filter_low(jump_imu_df_earth, columns=[f"{placement}_acc_magnitude"], cutoff=10)
             jump_imu_df_earth = butterworth_filter_high(jump_imu_df_earth, columns=[f"{placement}_acc_magnitude"], cutoff=0.5)
             takeoff_idx, landing_idx = detect_takeoff_and_landing(jump_imu_df_earth, placement)
-            #interactive_plot(jump_imu_df_earth, columns=[f'{placement}_acc_magnitude'], window_size=1000, title="Vertical impulse")
+            interactive_plot(jump_imu_df_earth, columns=[f'{placement}_acc_magnitude'], window_size=1000, title="Acceleration magnitude", x_label="Time (s)", y_label="Acceleration (m/s^2)")
             error = 5.0
             if takeoff_idx and landing_idx:
                 tof_values[placement] = jump_imu_df_earth['timestamp'].iloc[landing_idx] - jump_imu_df_earth['timestamp'].iloc[takeoff_idx]
